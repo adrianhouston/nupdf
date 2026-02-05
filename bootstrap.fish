@@ -108,8 +108,6 @@ if test $do_patch -eq 1
     set source $repo_dir/lib/src/main/java/com/artifex/mupdf/viewer/PageView.java
     if test -f $source
         echo -e "\033[1;36mPatching $(basename $source)...\033[0m"
-        sed -i '\#import android\.graphics\.Paint;#i\import android.graphics.ColorMatrix;' $source
-        sed -i '\#import android\.graphics\.Paint;#i\import android.graphics.ColorMatrixColorFilter;' $source
         sed -i '\#class PageView#rpatches/invertForDarkMode.java' $source
         sed -i 's#setBackgroundColor(.*);#setBackgroundColor((getResources().getConfiguration().uiMode \& android.content.res.Configuration.UI_MODE_NIGHT_MASK) == android.content.res.Configuration.UI_MODE_NIGHT_YES ? Color.BLACK : Color.WHITE);#' $source
         sed -i 's#mEntire\.setImageBitmap(mEntireBm);#mEntire\.setImageBitmap(invertForDarkMode(mEntireBm));#' $source
