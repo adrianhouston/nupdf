@@ -78,6 +78,14 @@ else
 end
 
 if test $do_patch -eq 1
+    set source $repo_dir/app/src/main/java/com/artifex/mupdf/viewer/app/LibraryActivity.java
+    if test -f $source
+        echo -e "\033[1;36mPatching $(basename $source)...\033[0m"
+        sed -i "s#package .*;#package app.adrianhouston.nupdf;#" $source
+    else
+        echo -e "\033[1;35mWarning: $source not found, skipping patch.\033[0m"
+    end
+
     set target $repo_dir/app/src/main/res/drawable/ic_nupdf.xml
     set source patches/(basename $target)
     if test -f $source
@@ -136,7 +144,7 @@ if test $do_patch -eq 1
     if test -f $source
         echo -e "\033[1;36mPatching $(basename $source)...\033[0m"
         sed -i 's#float MIN_SCALE\s*=.*;#float MIN_SCALE = 1.0f;#' $source
-        sed -i 's#float MAX_SCALE\s*=.*;#float MAX_SCALE = 4.0f;#' $source
+        sed -i 's#float MAX_SCALE\s*=.*;#float MAX_SCALE = 16.0f;#' $source
     else
         echo -e "\033[1;35mWarning: $source not found, skipping patch.\033[0m"
     end
