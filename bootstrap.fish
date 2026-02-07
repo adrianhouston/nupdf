@@ -96,6 +96,16 @@ if test $do_patch -eq 1
         echo -e "\033[1;35mWarning: $source not found, skipping patch.\033[0m"
     end
 
+    set source $repo_dir/app/build.gradle
+    if test -f $source
+        echo -e "\033[1;36mPatching $(basename $source)...\033[0m"
+        sed -i "s#namespace '[^']*'#namespace 'app.adrianhouston.nupdf'#" $source
+        sed -i "s#versionName '[^']*'#versionName '0.1.0'#" $source
+        sed -i "s#versionCode .*##" $source
+    else
+        echo -e "\033[1;35mWarning: $source not found, skipping patch.\033[0m"
+    end
+
     set source $repo_dir/lib/src/main/java/com/artifex/mupdf/viewer/DocumentActivity.java
     if test -f $source
         echo -e "\033[1;36mPatching $(basename $source)...\033[0m"
