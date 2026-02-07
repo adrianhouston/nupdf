@@ -22,6 +22,7 @@ end
 set repo_url https://github.com/ArtifexSoftware/mupdf-android-viewer.git
 set repo_dir (path basename -E $repo_url)
 set apk_path $repo_dir/app/build/outputs/apk/debug/app-universal-debug.apk
+set apk_path $repo_dir/app/build/outputs/apk/debug/app-arm64-v8a-debug.apk
 
 set do_quiet 0
 set do_update 0
@@ -120,7 +121,7 @@ if test $do_patch -eq 1
     if test -f $source
         echo -e "\033[1;36mPatching $(basename $source)...\033[0m"
         sed -i 's#float MIN_SCALE\s*=.*;#float MIN_SCALE = 1.0f;#' $source
-        sed -i 's#float MAX_SCALE\s*=.*;#float MAX_SCALE = 1.0f;#' $source
+        sed -i 's#float MAX_SCALE\s*=.*;#float MAX_SCALE = 4.0f;#' $source
     else
         echo -e "\033[1;35mWarning: $source not found, skipping patch.\033[0m"
     end
