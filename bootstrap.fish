@@ -100,7 +100,12 @@ if test $do_patch -eq 1
     if test -f $source
         echo -e "\033[1;36mPatching $(basename $source)...\033[0m"
         sed -i 's#layout\.setBackgroundColor(.*);#layout.setBackgroundColor((getResources().getConfiguration().uiMode \& android.content.res.Configuration.UI_MODE_NIGHT_MASK) == android.content.res.Configuration.UI_MODE_NIGHT_YES ? Color.BLACK : Color.WHITE);#' $source
-        sed -i 's#anim\.setDuration(.*);#anim.setDuration(0);#' $source
+        set mPageNumberView (sed -n '\#mPageNumberView\.setVisibility(View\.VISIBLE);#{p;q}' $source)
+        sed -i '\#mPageNumberView\.setVisibility(View\.VISIBLE);#d' $source
+        sed -i "\#mTopBarSwitcher\.setVisibility(View\.VISIBLE);#a\\$mPageNumberView" $source
+        set mPageNumberView (sed -n '\#mPageNumberView\.setVisibility(View\.INVISIBLE);#{p;q}' $source)
+        sed -i '\#mPageNumberView\.setVisibility(View\.INVISIBLE);#d' $source
+        sed -i "\#mTopBarSwitcher\.setVisibility(View\.INVISIBLE);#a\\$mPageNumberView" $source
         sed -i 's#mPageNumberView\.setText(String\.format(\(.*\), "%d / %d", \(.*\)));#mPageNumberView.setText(String.format(\1, "%0" + String.valueOf(core.countPages()).length() + "d / %d", \2));#' $source
     else
         echo -e "\033[1;35mWarning: $source not found, skipping patch.\033[0m"
@@ -163,17 +168,18 @@ if test $do_patch -eq 1
         sed -i '\#android:id="@+id/pageSlider"#s# android:paddingRight="[^"]*"# android:paddingRight="24dp"#' $source
         sed -i '\#android:id="@+id/pageSlider"#s# android:paddingTop="[^"]*"##' $source
         sed -i '\#android:id="@+id/pageSlider"#s# android:paddingBottom="[^"]*"##' $source
+        sed -i '\#android:id="@+id/pageSlider"#s# android:progressDrawable="[^"]*"# android:progressDrawable="@null"#' $source
         sed -i '\#android:id="@+id/pageSlider"#s#/># android:background="@drawable/page_indicator"/>#' $source
         sed -i '\#android:id="@+id/pageNumber"#s# android:layout_height="[^"]*"# android:layout_height="32dp" android:gravity="center"#' $source
         sed -i '\#android:id="@+id/pageNumber"#s# android:layout_above="[^"]*"##' $source
         sed -i '\#android:id="@+id/pageNumber"#s# android:layout_centerHorizontal="[^"]*"##' $source
         sed -i '\#android:id="@+id/pageNumber"#s# android:layout_marginBottom="[^"]*"# android:layout_marginLeft="16dp" android:layout_marginRight="32dp" android:layout_marginVertical="32dp"#' $source
         sed -i '\#android:id="@+id/pageNumber"#s#/># android:paddingLeft="12dp" android:paddingRight="12dp"/>#' $source
-        set pageSlider (sed -n '\# android:id="@+id/pageSlider"#p' $source)
-        set pageNumber (sed -n '\# android:id="@+id/pageNumber"#p' $source)
+        set pageSlider (sed -n '\# android:id="@+id/pageSlider"#{p;q}' $source)
         sed -i '\# android:id="@+id/pageSlider"#d' $source
-        sed -i '\# android:id="@+id/pageNumber"#d' $source
         sed -i "\# android:id=\"@+id/actionBar\"#i\\$pageSlider" $source
+        set pageNumber (sed -n '\# android:id="@+id/pageNumber"#{p;q}' $source)
+        sed -i '\# android:id="@+id/pageNumber"#d' $source
         sed -i "\# android:id=\"@+id/actionBar\"#i\\$pageNumber" $source
     else
         echo -e "\033[1;35mWarning: $source not found, skipping patch.\033[0m"
@@ -183,6 +189,14 @@ if test $do_patch -eq 1
     if test -f $source
         echo -e "\033[1;36mPatching $(basename $source)...\033[0m"
         sed -i 's/#C0202020/#F16625/' $source
+    else
+        echo -e "\033[1;35mWarning: $source not found, skipping patch.\033[0m"
+    end
+
+    set source $repo_dir/gradle.properties
+    if test -f $source
+        echo -e "\033[1;36mPatching $(basename $source)...\033[0m"
+        echo 'org.gradle.java.home=/usr/lib/jvm/java-21-openjdk' >>$source
     else
         echo -e "\033[1;35mWarning: $source not found, skipping patch.\033[0m"
     end
