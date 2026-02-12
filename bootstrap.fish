@@ -355,7 +355,7 @@ if test $do_publish -eq 1
 
     echo -e "\033[1;36mPublishing $repo_dir...\033[0m"
     eval git add $publ_dir README.md (status filename) $redirect
-    eval git commit -m "modified: $(status filename)" $redirect
+    eval git commit -m \"modified: $(status filename)\" $redirect
     eval git push origin main $redirect
 else
     echo -e "\033[1;33mSkipping publish.\033[0m"
@@ -363,6 +363,14 @@ end
 
 if test $do_clean -eq 1
     set source $repo_dir
+    if test -d $source
+        echo -e "\033[1;36mCleaning $(basename $source)...\033[0m"
+        rm -fr $source
+    else
+        echo -e "\033[1;35mWarning: $source not found, skipping clean.\033[0m"
+    end
+
+    set source $publ_dir
     if test -d $source
         echo -e "\033[1;36mCleaning $(basename $source)...\033[0m"
         rm -fr $source
