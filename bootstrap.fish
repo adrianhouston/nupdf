@@ -196,7 +196,7 @@ if test $do_patch -eq 1
         sed -i 's#float b = [^;]*;#float b = (actionListener.fitPage) ? ((canvasW + bitmapW) / 2) : (canvasW * 4 / 5);#' $source
         sed -i '\#float b = [^;]*;#a\\\t\t\tfloat d = (canvasH + bitmapH) / 2;' $source
         sed -i 's#if (x <= a)#if (x <= a || y <= c)#' $source
-        sed -i 's#if (x >= b)#if (x >= b || y <= d)#' $source
+        sed -i 's#if (x >= b)#if (x >= b || y >= d)#' $source
         sed -i 's#if (x > a && x < b && actionListener != null)#if (x > a \&\& x < b \&\& y > c \&\& y < d \&\& actionListener != null)#' $source
         sed -i '\#public synchronized boolean onScroll#a\\\t\tif (actionListener.fitPage && viewScale == 1) { if (!wentBackward && dx <= -25) { goBackward(); wentBackward = true; wentForward = false; } if (!wentForward && dx >= 25) { goForward(); wentForward = true; wentBackward = false; } invalidate(); }' $source
     else
