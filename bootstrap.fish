@@ -189,11 +189,16 @@ if test $do_patch -eq 1
         sed -i '\#public boolean onDown#a\\\t\twentBackward = false;\n\t\twentForward = false;' $source
         sed -i 's#public boolean onSingleTapUp#public boolean onSingleTapConfirmed#' $source
         sed -i '\#public boolean onSingleTapConfirmed#i\\\tpublic boolean onSingleTapUp(MotionEvent e) { return false; }\n' $source
-        sed -i '\#public boolean onSingleTapConfirmed#i\\\tpublic boolean onDoubleTap(MotionEvent e) { if (viewScale == 1) { float x = e.getX(); float alpha = (canvasW - bitmapW) / 2 ; float beta = (canvasW + bitmapW) / 2 ; if (x <= alpha) goBackward(); if (x >= beta) goForward(); if (x > alpha && x < beta && actionListener != null) { actionListener.fitPage = !actionListener.fitPage; actionListener.loadPage(); } } else { viewScale = 1; if (bitmap != null) { bitmapW = (int)(bitmap.getWidth() * viewScale / pageScale); bitmapH = (int)(bitmap.getHeight() * viewScale / pageScale); } } invalidate(); return true; }\n' $source
+        sed -i '\#public boolean onSingleTapConfirmed#i\\\tpublic boolean onDoubleTap(MotionEvent e) { if (viewScale == 1) { float x = e.getX(); float y = e.getY(); float alpha = (canvasW - bitmapW) / 2 ; float beta = (canvasW + bitmapW) / 2 ; float gamma = (canvasH - bitmapH) / 2 ; float delta = (canvasH + bitmapH) / 2 ; if (x <= alpha || y <= gamma) goBackward(); if (x >= beta || y >= delta) goForward(); if (x > alpha && x < beta && y > gamma && y < delta && actionListener != null) { actionListener.fitPage = !actionListener.fitPage; actionListener.loadPage(); } } else { viewScale = 1; if (bitmap != null) { bitmapW = (int)(bitmap.getWidth() * viewScale / pageScale); bitmapH = (int)(bitmap.getHeight() * viewScale / pageScale); } } invalidate(); return true; }\n' $source
         sed -i '\#public boolean onSingleTapConfirmed#i\\\tpublic boolean onDoubleTapEvent(MotionEvent e) { return false; }\n' $source
         sed -i 's#float a = [^;]*;#float a = (actionListener.fitPage) ? ((canvasW - bitmapW) / 2) : (canvasW * 1 / 5);#' $source
+        sed -i '\#float a = [^;]*;#a\\\t\t\tfloat c = (canvasH - bitmapH) / 2;' $source
         sed -i 's#float b = [^;]*;#float b = (actionListener.fitPage) ? ((canvasW + bitmapW) / 2) : (canvasW * 4 / 5);#' $source
-        sed -i '\#public synchronized boolean onScroll#a\\\t\tif (actionListener.fitPage && viewScale == 1) { if (!wentBackward && dx <= -50) { goBackward(); wentBackward = true; wentForward = false; } if (!wentForward && dx >= 50) { goForward(); wentForward = true; wentBackward = false; } invalidate(); }' $source
+        sed -i '\#float b = [^;]*;#a\\\t\t\tfloat d = (canvasH + bitmapH) / 2;' $source
+        sed -i 's#if (x <= a)#if (x <= a || y <= c)#' $source
+        sed -i 's#if (x >= b)#if (x >= b || y <= d)#' $source
+        sed -i 's#if (x > a && x < b && actionListener != null)#if (x > a \&\& x < b \&\& y > c \&\& y < d \&\& actionListener != null)#' $source
+        sed -i '\#public synchronized boolean onScroll#a\\\t\tif (actionListener.fitPage && viewScale == 1) { if (!wentBackward && dx <= -25) { goBackward(); wentBackward = true; wentForward = false; } if (!wentForward && dx >= 25) { goForward(); wentForward = true; wentBackward = false; } invalidate(); }' $source
     else
         echo -e "\033[1;35mWarning: $source not found, skipping patch.\033[0m"
     end
