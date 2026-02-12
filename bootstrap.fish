@@ -169,6 +169,7 @@ if test $do_patch -eq 1
         echo -e "\033[1;36mPatching $(basename $source)...\033[0m"
         sed -i '\#import android.app.Activity;#a\import android.app.ActivityManager;' $source
         sed -i '\#titleLabel\.setText([^)]*);#a\setTaskDescription(new ActivityManager.TaskDescription(title, null, 0));' $source
+        sed -i 's#prefs\.getBoolean("fitPage", [^)]*);#prefs.getBoolean("fitPage", true);#' $source
         sed -i 's#pageLabel\.setText([^)]*);#pageLabel.setText(String.format("%0" + String.valueOf(pageCount).length() + "d", pageNumber) + " / " + pageCount);#' $source
         sed -i '\#protected void loadPage#i\\\tprivate Bitmap invertBitmap(Bitmap src) { int width = src.getWidth(); int height = src.getHeight(); int[] pixels = new int[width * height]; src.getPixels(pixels, 0, width, 0, 0, width, height); for (int i = 0; i < pixels.length; i++) pixels[i] = (pixels[i] & 0xFF000000) | (~pixels[i] & 0x00FFFFFF); src.setPixels(pixels, 0, width, 0, 0, width, height); return src; }\n' $source
         sed -i 's#pageView\.setBitmap([^)]*);#pageView.setBitmap(((getResources().getConfiguration().uiMode \& android.content.res.Configuration.UI_MODE_NIGHT_MASK) == android.content.res.Configuration.UI_MODE_NIGHT_YES) ? invertBitmap(bitmap) : bitmap, zoom, wentBack, toggledUI, newSearchHitPage, linkBounds, linkURIs, hits);#' $source
