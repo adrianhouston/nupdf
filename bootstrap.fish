@@ -182,7 +182,7 @@ if test $do_patch -eq 1
         echo -e "\033[1;36mPatching $(basename $source)...\033[0m"
         sed -i '\#public class PageView#i\import androidx.core.content.ContextCompat;\n' $source
         sed -i "s#\tGestureDetector\.OnGestureListener,#\tGestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener,#" $source
-        sed -i '\#protected boolean showLinks;#a\\\n\tprotected boolean wentBackward = false;\n\tprotected boolean wentForward = false;' $source
+        sed -i '\#protected boolean showLinks;#a\\\n\tprotected boolean wentBackward;\n\tprotected boolean wentForward;' $source
         sed -i '\#detector = [^;]*;#a\\\t\tdetector.setOnDoubleTapListener(this);' $source
         sed -i 's#maxScale = [^;]*;#maxScale = 4;#' $source
         sed -i 's#linkPaint\.setARGB([^)]*);#linkPaint.setColor(ContextCompat.getColor(getContext(), R.color.theme));\n\t\tlinkPaint.setAlpha(32);#' $source
@@ -193,7 +193,7 @@ if test $do_patch -eq 1
         sed -i '\#public boolean onSingleTapConfirmed#i\\\tpublic boolean onDoubleTapEvent(MotionEvent e) { return false; }\n' $source
         sed -i 's#float a = [^;]*;#float a = (actionListener.fitPage) ? ((canvasW - bitmapW) / 2) : (canvasW * 1 / 5);#' $source
         sed -i 's#float b = [^;]*;#float b = (actionListener.fitPage) ? ((canvasW + bitmapW) / 2) : (canvasW * 4 / 5);#' $source
-        sed -i '\#public synchronized boolean onScroll#a\\\t\tif (actionListener.fitPage && viewScale == 1) { if (!wentBackward && dx <= -50) { goBackward(); wentBackward = true; } if (!wentForward && dx >= 50) { goForward(); wentForward = true; } invalidate(); }' $source
+        sed -i '\#public synchronized boolean onScroll#a\\\t\tif (actionListener.fitPage && viewScale == 1) { if (!wentBackward && dx <= -50) { goBackward(); wentBackward = true; wentForward = false; } if (!wentForward && dx >= 50) { goForward(); wentForward = true; wentBackward = false; } invalidate(); }' $source
     else
         echo -e "\033[1;35mWarning: $source not found, skipping patch.\033[0m"
     end
