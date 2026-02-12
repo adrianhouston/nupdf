@@ -370,13 +370,13 @@ if test $do_clean -eq 1
         echo -e "\033[1;35mWarning: $source not found, skipping clean.\033[0m"
     end
 
-    set source $publ_dir
-    if test -d $source
-        echo -e "\033[1;36mCleaning $(basename $source)...\033[0m"
-        rm -fr $source
-    else
-        echo -e "\033[1;35mWarning: $source not found, skipping clean.\033[0m"
-    end
+    # set source $publ_dir
+    # if test -d $source
+    #     echo -e "\033[1;36mCleaning $(basename $source)...\033[0m"
+    #     rm -fr $source
+    # else
+    #     echo -e "\033[1;35mWarning: $source not found, skipping clean.\033[0m"
+    # end
 else
     echo -e "\033[1;33mSkipping clean.\033[0m"
 end
