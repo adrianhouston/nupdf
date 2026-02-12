@@ -41,7 +41,8 @@ end
 
 set theme "#F16625"
 
-set repo_url https://github.com/ArtifexSoftware/mupdf-android-viewer-mini.git # backup/mupdf-android-viewer-mini
+set repo_url https://github.com/ArtifexSoftware/mupdf-android-viewer-mini.git
+# set repo_url backup/mupdf-android-viewer-mini
 set repo_dir (path basename -E $repo_url)
 set publ_dir extras
 set apk_path $repo_dir/app/build/outputs/apk/debug/app-{arm64-v8a,armeabi-v7a,universal,x86_64,x86}-debug.apk
@@ -123,7 +124,7 @@ if test $do_patch -eq 1
     end
 
     set source app/src/main/res/drawable/ic_nupdf.xml
-    touch $source
+    mkdir -p (dirname $source) && touch $source
     if test -f $source
         echo -e "\033[1;36mPatching $(basename $source)...\033[0m"
         echo '<?xml version="1.0" encoding="utf-8"?>
@@ -205,8 +206,7 @@ if test $do_patch -eq 1
         echo -e "\033[1;35mWarning: $source not found, skipping patch.\033[0m"
     end
 
-    set source lib/src/main/res/drawable/page_indicator.xml
-    touch $source
+    set source lib/src/main/res/drawable/button.xml
     if test -f $source
         echo -e "\033[1;36mPatching $(basename $source)...\033[0m"
         echo '<?xml version="1.0" encoding="utf-8"?>
@@ -218,8 +218,38 @@ if test $do_patch -eq 1
         echo -e "\033[1;35mWarning: $source not found, skipping patch.\033[0m"
     end
 
+    set source lib/src/main/res/drawable/cursor.xml
+    mkdir -p (dirname $source) && touch $source
+    if test -f $source
+        echo -e "\033[1;36mPatching $(basename $source)...\033[0m"
+        echo '<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <size android:width="2dp" />
+    <solid android:color="@color/theme_alpha" />
+</shape>' | xmllint --output $source --format -
+    else
+        echo -e "\033[1;35mWarning: $source not found, skipping patch.\033[0m"
+    end
+
+    set source lib/src/main/res/drawable/ic_chevron_left_white_24dp.xml
+    if test -f $source
+        echo -e "\033[1;36mPatching $(basename $source)...\033[0m"
+        xmllint --output $source --format $source
+        sed -i 's# android:fillColor="[^"]*"# android:fillColor="@color/theme_alpha"#' $source
+    else
+        echo -e "\033[1;35mWarning: $source not found, skipping patch.\033[0m"
+    end
+
+    set source lib/src/main/res/drawable/ic_chevron_right_white_24dp.xml
+    if test -f $source
+        echo -e "\033[1;36mPatching $(basename $source)...\033[0m"
+        xmllint --output $source --format $source
+        sed -i 's# android:fillColor="[^"]*"# android:fillColor="@color/theme_alpha"#' $source
+    else
+        echo -e "\033[1;35mWarning: $source not found, skipping patch.\033[0m"
+    end
+
     set source lib/src/main/res/drawable/seek_thumb.xml
-    touch $source
     if test -f $source
         echo -e "\033[1;36mPatching $(basename $source)...\033[0m"
         echo '<?xml version="1.0" encoding="utf-8"?>
@@ -235,38 +265,37 @@ if test $do_patch -eq 1
     set source lib/src/main/res/layout/document_activity.xml
     if test -f $source
         echo -e "\033[1;36mPatching $(basename $source)...\033[0m"
-        xmllint --output $source --format $source
-        sed -i '\# android:id="@+id/background_layout"#s# android:background="[^"]*"# android:background="@color/theme_alpha"#' $source
-        sed -i '\# android:id="@+id/page_view"#s# android:background="[^"]*"# android:background="@color/theme_alpha"#' $source
-        sed -i '\# android:id="@+id/page_view"#s#/># android:paddingTop="96dp"/>#' $source
-        sed -i '\# android:id="@+id/top_bar"#s# android:orientation="[^"]*"# android:orientation="horizontal"#' $source
-        sed -i '\# android:id="@+id/top_bar"#s# android:background="[^"]*"# android:background="@null"#' $source
-        sed -i '\# android:id="@+id/action_bar"#s# android:layout_width="[^"]*"# android:layout_width="0dp"#' $source
-        sed -i '\# android:id="@+id/action_bar"#s# android:layout_height="[^"]*"# android:layout_height="0dp"#' $source
-        sed -i '\# android:id="@+id/search_bar"#s# android:layout_width="[^"]*"# android:layout_width="0dp"#' $source
-        sed -i '\# android:id="@+id/search_bar"#s# android:layout_height="[^"]*"# android:layout_height="0dp"#' $source
-        sed -i '\# android:id="@+id/bottom_bar"#s# android:layout_width="[^"]*"# android:layout_width="0dp"#' $source
-        sed -i '\# android:id="@+id/bottom_bar"#s# android:layout_height="[^"]*"# android:layout_height="0dp"#' $source
-        sed -i '\# android:id="@+id/page_seekbar"#s# android:layout_height="[^"]*"# android:layout_height="32dp"#' $source
-        sed -i '\# android:id="@+id/page_seekbar"#s# android:progressDrawable="[^"]*"# android:progressDrawable="@null"#' $source
-        sed -i '\# android:id="@+id/page_seekbar"#s#/># android:background="@drawable/page_indicator" android:paddingHorizontal="24dp" android:layout_marginLeft="32dp" android:layout_marginRight="16dp" android:layout_marginVertical="32dp"/>#' $source
-        sed -i '\# android:id="@+id/page_label"#s# android:layout_height="[^"]*"# android:layout_height="32dp"#' $source
-        sed -i '\# android:id="@+id/page_label"#s# android:textColor="[^"]*"# android:textColor="@color/theme_alpha"#' $source
-        sed -i '\# android:id="@+id/page_label"#s# android:gravity="[^"]*"# android:gravity="center"#' $source
-        sed -i '\# android:id="@+id/page_label"#s# android:padding="[^"]*"# android:paddingHorizontal="12dp"#' $source
-        sed -i '\# android:id="@+id/page_label"#s#/># android:background="@drawable/page_indicator" android:layout_marginLeft="16dp" android:layout_marginRight="32dp" android:layout_marginVertical="32dp"/>#' $source
-        set page_seekbar (sed -n '\# android:id="@+id/page_seekbar"#{p;q}' $source)
-        sed -i '\# android:id="@+id/page_seekbar"#d' $source
-        sed -i "\# android:id=\"@+id/action_bar\"#i\\$page_seekbar" $source
-        set page_label (sed -n '\# android:id="@+id/page_label"#{p;q}' $source)
-        sed -i '\# android:id="@+id/page_label"#d' $source
-        sed -i "\# android:id=\"@+id/action_bar\"#i\\$page_label" $source
+        echo '<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/background_layout" android:layout_width="match_parent" android:layout_height="match_parent" android:keepScreenOn="true" android:background="@color/theme_alpha">
+    <com.artifex.mupdf.mini.PageView android:id="@+id/page_view" android:layout_width="match_parent" android:layout_height="match_parent" android:background="@color/theme_alpha" android:keepScreenOn="true" />
+    <LinearLayout android:id="@+id/top_bar" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_alignParentTop="true" android:orientation="vertical" android:background="@null" android:visibility="gone">
+        <LinearLayout android:id="@+id/action_bar" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:visibility="gone">
+            <TextView android:id="@+id/title_label" android:layout_width="0dp" android:layout_height="0dp" android:layout_gravity="center" android:layout_weight="0" android:layout_marginLeft="0dp" android:layout_marginRight="0dp" android:textColor="@color/theme_alpha" android:singleLine="true" android:ellipsize="end" android:textSize="16sp" />
+            <SeekBar android:id="@+id/page_seekbar" android:layout_width="0dp" android:layout_height="32dp" android:layout_weight="1" android:layout_gravity="center" android:thumb="@drawable/seek_thumb" android:progressDrawable="@null" android:max="0" android:background="@drawable/button" android:paddingHorizontal="24dp" android:layout_marginLeft="32dp" android:layout_marginRight="16dp" android:layout_marginVertical="32dp" />
+            <TextView android:id="@+id/page_label" android:layout_width="wrap_content" android:layout_height="32dp" android:layout_gravity="center" android:textColor="@color/theme_alpha" android:singleLine="true" android:ellipsize="end" android:gravity="center" android:paddingHorizontal="12dp" android:textSize="16sp" android:text="- / -" android:background="@drawable/button" android:layout_marginLeft="16dp" android:layout_marginRight="32dp" android:layout_marginVertical="32dp" />
+            <ImageButton android:id="@+id/search_button" android:layout_width="0dp" android:layout_height="0dp" android:layout_gravity="center" android:background="@drawable/button" android:src="@drawable/ic_search_white_24dp" />
+            <ImageButton android:id="@+id/zoom_button" android:layout_width="0dp" android:layout_height="0dp" android:layout_gravity="center" android:background="@drawable/button" android:src="@drawable/ic_zoom_out_map_white_24dp" android:visibility="gone" />
+            <ImageButton android:id="@+id/layout_button" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center" android:background="@drawable/button" android:src="@drawable/ic_format_size_white_24dp" android:visibility="gone" />
+            <ImageButton android:id="@+id/outline_button" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center" android:background="@drawable/button" android:src="@drawable/ic_toc_white_24dp" android:visibility="gone" />
+        </LinearLayout>
+        <LinearLayout android:id="@+id/search_bar" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:visibility="gone">
+            <ImageButton android:id="@+id/search_close_button" android:layout_width="0dp" android:layout_height="0dp" android:layout_gravity="center" android:background="@drawable/button" android:src="@drawable/ic_close_white_24dp" />
+            <EditText android:id="@+id/search_text" android:layout_width="0dp" android:layout_height="32dp" android:layout_gravity="center" android:layout_weight="1" android:layout_marginLeft="32dp" android:layout_marginRight="16dp" android:layout_marginVertical="32dp" android:background="@drawable/button" android:textColor="@color/theme_alpha" android:textColorHint="@color/theme_alpha" android:singleLine="true" android:paddingHorizontal="12dp" android:textSize="16sp" android:textCursorDrawable="@drawable/cursor" android:hint="@string/text_search_hint" android:inputType="text" android:imeOptions="actionSearch" android:importantForAutofill="no" />
+            <LinearLayout android:layout_width="wrap_content" android:layout_height="32dp" android:orientation="horizontal" android:background="@drawable/button" android:layout_marginLeft="16dp" android:layout_marginRight="32dp" android:layout_marginVertical="32dp" >
+                <ImageButton android:id="@+id/search_backward_button" android:layout_width="wrap_content" android:layout_height="32dp" android:layout_gravity="center" android:background="@null" android:paddingHorizontal="6dp" android:src="@drawable/ic_chevron_left_white_24dp" />
+                <ImageButton android:id="@+id/search_forward_button" android:layout_width="wrap_content" android:layout_height="32dp" android:layout_gravity="center" android:background="@null" android:paddingHorizontal="6dp" android:src="@drawable/ic_chevron_right_white_24dp" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+    <LinearLayout android:id="@+id/bottom_bar" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_alignParentBottom="true" android:orientation="horizontal" android:background="@null" android:visibility="gone">
+    </LinearLayout>
+</RelativeLayout>' | xmllint --output $source --format -
     else
         echo -e "\033[1;35mWarning: $source not found, skipping patch.\033[0m"
     end
 
     set source lib/src/main/res/values/colors.xml
-    touch $source
+    mkdir -p (dirname $source) && touch $source
     if test -f $source
         echo -e "\033[1;36mPatching $(basename $source)...\033[0m"
         echo '<?xml version="1.0" encoding="utf-8"?>
@@ -340,7 +369,7 @@ if test $do_publish -eq 1
     mkdir -p $publ_dir
 
     set source $publ_dir/nupdf.svg
-    touch $source
+    mkdir -p (dirname $source) && touch $source
     if test -f $source
         echo -e "\033[1;36mPublishing $(basename $source)...\033[0m"
         echo '<?xml version="1.0" encoding="utf-8"?>
