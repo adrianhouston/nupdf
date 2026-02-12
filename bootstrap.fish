@@ -353,7 +353,7 @@ if test $do_publish -eq 1
         end
     end
 
-    echo -e "\033[1;36mPublishing $repo_dir...\033[0m"
+    echo -e "\033[1;36mPublishing $(basename (realpath (status dirname)))...\033[0m"
     eval git add $publ_dir README.md (status filename) $redirect
     eval git commit -m \"modified: $(status filename)\" $redirect
     eval git push origin main $redirect
