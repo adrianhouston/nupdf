@@ -39,6 +39,8 @@ function blend
     printf "#%02X%02X%02X" $R $G $B
 end
 
+set theme "#F16625"
+
 set repo_url https://github.com/ArtifexSoftware/mupdf-android-viewer-mini.git # backup/mupdf-android-viewer-mini
 set repo_dir (path basename -E $repo_url)
 set publ_dir extras
@@ -135,10 +137,10 @@ if test $do_patch -eq 1
         android:fillColor="#FFF" />
     <path
         android:pathData="M 08 08 L 04 04 V 12 H 08 Z M 07 '(math 07 + sqrt 2)' V 11 H 05 V '(math 05 + sqrt 2)' Z"
-        android:fillColor="#F16625" />
+        android:fillColor="'$theme'" />
     <path
         android:pathData="M 08 08 L 12 12 V 04 H 08 Z M 09 '(math 09 - sqrt 2)' V 05 H 11 V '(math 11 - sqrt 2)' Z"
-        android:fillColor="#F16625" />
+        android:fillColor="'$theme'" />
 </vector>' | xmllint --output $source --format -
     else
         echo -e "\033[1;35mWarning: $source not found, skipping patch.\033[0m"
@@ -269,8 +271,8 @@ if test $do_patch -eq 1
         echo -e "\033[1;36mPatching $(basename $source)...\033[0m"
         echo '<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="theme">#F16625</color>
-    <color name="theme_alpha">'(blend "#20F16625" "#FFFFFF")'</color>
+    <color name="theme">'$theme'</color>
+    <color name="theme_alpha">'(blend "#20$(string sub -s 2 $theme)" "#FFFFFF")'</color>
 </resources>
 ' | xmllint --output $source --format -
     else
@@ -283,8 +285,8 @@ if test $do_patch -eq 1
         echo -e "\033[1;36mPatching $(basename $source)...\033[0m"
         echo '<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="theme">#F16625</color>
-    <color name="theme_alpha">'(blend "#20F16625" "#000000")'</color>
+    <color name="theme">'$theme'</color>
+    <color name="theme_alpha">'(blend "#20$(string sub -s 2 $theme)" "#000000")'</color>
 </resources>
 ' | xmllint --output $source --format -
     else
@@ -343,8 +345,8 @@ if test $do_publish -eq 1
         echo -e "\033[1;36mPublishing $(basename $source)...\033[0m"
         echo '<?xml version="1.0" encoding="utf-8"?>
 <svg viewBox="4 4 8 8" xmlns="http://www.w3.org/2000/svg">
-    <path d="M 08 08 L 04 04 V 12 H 08 Z M 07 '(math 07 + sqrt 2)' V 11 H 05 V '(math 05 + sqrt 2)' Z" fill="#F16625" />
-    <path d="M 08 08 L 12 12 V 04 H 08 Z M 09 '(math 09 - sqrt 2)' V 05 H 11 V '(math 11 - sqrt 2)' Z" fill="#F16625" />
+    <path d="M 08 08 L 04 04 V 12 H 08 Z M 07 '(math 07 + sqrt 2)' V 11 H 05 V '(math 05 + sqrt 2)' Z" fill="'$theme'" />
+    <path d="M 08 08 L 12 12 V 04 H 08 Z M 09 '(math 09 - sqrt 2)' V 05 H 11 V '(math 11 - sqrt 2)' Z" fill="'$theme'" />
 </svg>' | xmllint --output $source --format -
     else
         echo -e "\033[1;35mWarning: $source not found, skipping publish.\033[0m"
